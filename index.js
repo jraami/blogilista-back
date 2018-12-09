@@ -17,8 +17,10 @@ mongoose
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('build'))
-morgan.token('bodycontent', function (req, res) { return JSON.stringify(req.body) })
-app.use(morgan(':method :url :bodycontent :status :res[content-length] - :response-time ms'))
+if (process.env.NODE_ENV === 'test') {
+    morgan.token('bodycontent', function (req, res) { return JSON.stringify(req.body) })
+    app.use(morgan(':method :url :bodycontent :status :res[content-length] - :response-time ms'))
+}
 app.use('/api/blogs', blogRouter)
 app.use(middleware.error)
 

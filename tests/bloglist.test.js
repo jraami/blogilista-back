@@ -1,92 +1,30 @@
 const TestHelper = require('../utils/testhelper')
+const mockDB = require('../utils/mockdb')
 
 const emptyList = []
+test('Dummy test', () => expect(TestHelper.dummy(emptyList)).toBe(1))
 
-const singleBlog = [
-    {
-        _id: '5a422aa71b54a676234d17f8',
-        title: 'Go To Statement Considered Harmful',
-        author: 'Edsger W. Dijkstra',
-        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-        likes: 5,
-        __v: 0
-    }
-]
-
-const multipleBlogs = [
-    {
-        _id: "5a422a851b54a676234d17f7",
-        title: "React patterns",
-        author: "Michael Chan",
-        url: "https://reactpatterns.com/",
-        likes: 7,
-        __v: 0
-    },
-    {
-        _id: "5a422aa71b54a676234d17f8",
-        title: "Go To Statement Considered Harmful",
-        author: "Edsger W. Dijkstra",
-        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-        likes: 5,
-        __v: 0
-    },
-    {
-        _id: "5a422b3a1b54a676234d17f9",
-        title: "Canonical string reduction",
-        author: "Edsger W. Dijkstra",
-        url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-        likes: 12,
-        __v: 0
-    },
-    {
-        _id: "5a422b891b54a676234d17fa",
-        title: "First class tests",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-        likes: 10,
-        __v: 0
-    },
-    {
-        _id: "5a422ba71b54a676234d17fb",
-        title: "TDD harms architecture",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-        likes: 0,
-        __v: 0
-    },
-    {
-        _id: "5a422bc61b54a676234d17fc",
-        title: "Type wars",
-        author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-        likes: 2,
-        __v: 0
-    }
-]
-
-test.skip('Dummy test', () => expect(TestHelper.dummy(emptyList)).toBe(1))
-
-describe.skip('Total likes of blog entries', () => {
+describe('Total likes of blog entries', () => {
     // Total likes
     test('Zero entries', () => expect(TestHelper.totalLikes(emptyList)).toBe(0))
-    test('One entry', () => expect(TestHelper.totalLikes(singleBlog)).toBe(5))
-    test('Multiple entries', () => expect(TestHelper.totalLikes(multipleBlogs)).toBe(36))
+    test('One entry', () => expect(TestHelper.totalLikes(mockDB.singleEntry)).toBe(5))
+    test('Multiple entries', () => expect(TestHelper.totalLikes(mockDB.testDatabase)).toBe(36))
 })
 
-describe.skip('Top blogs', () => {
+describe('Top blogs', () => {
     // Top blog
     test('Favorite blog, zero entries', () => expect(TestHelper.favoriteBlog(emptyList)).toBe(undefined))
-    test('Favorite blog, one entry', () => expect(TestHelper.favoriteBlog(singleBlog)).toBe('Go To Statement Considered Harmful'))
-    test('Favorite blog, multiple entries', () => expect(TestHelper.favoriteBlog(multipleBlogs)).toBe("Canonical string reduction"))
+    test('Favorite blog, one entry', () => expect(TestHelper.favoriteBlog(mockDB.singleEntry)).toBe('Go To Statement Considered Harmful'))
+    test('Favorite blog, multiple entries', () => expect(TestHelper.favoriteBlog(mockDB.testDatabase)).toBe("Canonical string reduction"))
 })
 
-describe.skip('Top authors', () => {
+describe('Top authors', () => {
     // Most blogs
     test('Top author, most blogs, zero entries', () => expect(TestHelper.mostBlogs(emptyList).name).toBe(undefined))
-    test('Top author, most blogs, one entry', () => expect(TestHelper.mostBlogs(singleBlog).name).toBe('Edsger W. Dijkstra'))
-    test('Top author, most blogs', () => expect(TestHelper.mostBlogs(multipleBlogs).name).toBe("Robert C. Martin"))
+    test('Top author, most blogs, one entry', () => expect(TestHelper.mostBlogs(mockDB.singleEntry).name).toBe('Edsger W. Dijkstra'))
+    test('Top author, most blogs', () => expect(TestHelper.mostBlogs(mockDB.testDatabase).name).toBe("Robert C. Martin"))
     // Most likes
     test('Top author, most likes, zero entries', () => expect(TestHelper.mostLikes(emptyList).name).toBe(undefined))
-    test('Top author, most likes, one entry', () => expect(TestHelper.mostLikes(singleBlog).name).toBe('Edsger W. Dijkstra'))
-    test('Top author, most likes', () => expect(TestHelper.mostLikes(multipleBlogs).name).toBe('Edsger W. Dijkstra'))
+    test('Top author, most likes, one entry', () => expect(TestHelper.mostLikes(mockDB.singleEntry).name).toBe('Edsger W. Dijkstra'))
+    test('Top author, most likes', () => expect(TestHelper.mostLikes(mockDB.testDatabase).name).toBe('Edsger W. Dijkstra'))
 })

@@ -1,26 +1,16 @@
+const mockDB = require('../utils/mockdb')
+const Blog = require('../models/blog')
 const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 
-const testEntry = {
-    title: 'A harmless test entry',
-    author: 'Asshole B. Munch',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5
-}
-const noLikesEntry = {
-    title: 'A harmless test entry',
-    author: 'Asshole B. Munch',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
-}
-const noTitleEntry = {
-    author: 'Asshole B. Munch',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
-}
-const noUrlEntry = {
-    title: 'A harmless test entry',
-    author: 'Asshole B. Munch'
-}
+beforeAll(async () => {
+    await Blog.deleteMany({})
+    mockDB.testDatabase.forEach(async (entry) => {
+        let blogEntry = new Blog(entry)
+        await blogEntry.save()
+    })
+})
 
 describe('API tests', async () => {
 
@@ -34,7 +24,7 @@ describe('API tests', async () => {
     test('POST works', async () => {
         await api
             .post('/api/blogs')
-            .send(testEntry)
+            .send(mockDB.testEntry)
             .expect(201)
             .expect('Content-Type', /application\/json/)
     })
@@ -45,22 +35,20 @@ describe('Blog entry form tests', async () => {
     test('Likes default to zero', async () => {
         const response = await api
             .post('/api/blogs')
-            .send(noLikesEntry)
+            .send(mockDB.noLikesEntry)
             .expect(201)
-        console.log(response)
-        console.log("")
         expect(response.body.likes).toEqual(0)
     })
     test('No title responded with 400', async () => {
         await api
             .post('/api/blogs')
-            .send(noTitleEntry)
+            .send(mockDB.noTitleEntry)
             .expect(400)
     })
     test('No URL responded with 400', async () => {
         await api
             .post('/api/blogs')
-            .send(noUrlEntry)
+            .send(mockDB.noUrlEntry)
             .expect(400)
     })
 })

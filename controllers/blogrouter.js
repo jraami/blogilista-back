@@ -3,6 +3,7 @@ const Blog = require('../models/blog')
 
 const formatPost = (blog) => {
     return {
+        id: blog._id || "",
         title: blog.title || "",
         author: blog.author || "Not Known",
         url: blog.url || "",
@@ -10,23 +11,70 @@ const formatPost = (blog) => {
     }
 }
 
-blogRouter.get('/', (request, response) => {
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
+blogRouter.get('/', async (request, response) => {
+    try {
+        const entries = await Blog.find({})
+        if (entries) {
+            response.json(entries.map(formatPost))
+        } else {
+            response.status(404).end()
+        }
+    }
+    catch (exception) {
+        response.status(400).send({ error: exception })
+    }
 })
 
-blogRouter.post('/', (request, response) => {
-    const blog = new Blog(formatPost(request.body))
-    if (blog.title === "") return response.status(400).json({ error: 'Entry needs a name' })
-    if (blog.url === "") return response.status(400).json({ error: 'Entry needs a URL' })
-    blog
-        .save()
-        .then(result => {
-            response.status(201).json(result)
-        })
+blogRouter.get('/:id', async (request, response) => {
+    try {
+        const entry = await Blog.save()
+        if (entry) {
+            response.status(204).end()
+            response.json(formatPost(entry))
+        } else {
+            response.status(404).end()
+        }
+    }
+    catch (exception) {
+        response.status(400).send({ error: exception })
+    }
+})
+
+blogRouter.post('/', async (request, response) => {
+    try {
+        const entry = await Blog(formatPost(request.body))
+        if (entry) {
+            if (entry.title === "") return response.status(400).json({ error: 'Entry needs a name' })
+            if (entry.url === "") return response.status(400).json({ error: 'Entry needs a URL' })
+            const entrySaved = await entry.save()
+            if (entrySaved) {
+                response.status(201).json(entrySaved)
+            }
+        } else {
+            response.status(400).end()
+        }
+    }
+    catch (exception) {
+        response.status(400).send({ error: exception })
+    }
+})
+
+blogRouter.delete('/:id', async (request, response) => {
+    try {
+        await Blog.findByIdAndRemove(request.params.id)
+        response.status(204).end()
+    } catch (exception) {
+        response.status(400).send({ error: exception })
+    }
+})
+
+blogRouter.delete('/', async (request, response) => {
+    try {
+        await Blog.deleteMany({})
+        response.status(204).end()
+    } catch (exception) {
+        response.status(400).send({ error: exception })
+    }
 })
 
 module.exports = blogRouter
