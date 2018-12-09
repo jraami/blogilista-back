@@ -1,14 +1,12 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
-const mongoose = require('mongoose')
 
-const formatBlog = (blog) => {
+const formatPost = (blog) => {
     return {
-        id: blog._id,
-        title: blog.title,
-        author: blog.author,
-        url: blog.url,
-        likes: blog.likes
+        title: blog.title || "",
+        author: blog.author || "Not Known",
+        url: blog.url || "",
+        likes: blog.likes || 0
     }
 }
 
@@ -21,8 +19,9 @@ blogRouter.get('/', (request, response) => {
 })
 
 blogRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
-
+    const blog = new Blog(formatPost(request.body))
+    if (blog.title === "") return response.status(400).json({ error: 'Entry needs a name' })
+    if (blog.url === "") return response.status(400).json({ error: 'Entry needs a URL' })
     blog
         .save()
         .then(result => {

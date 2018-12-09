@@ -64,23 +64,23 @@ const multipleBlogs = [
     }
 ]
 
-test('Dummy test', () => expect(TestHelper.dummy(emptyList)).toBe(1))
+test.skip('Dummy test', () => expect(TestHelper.dummy(emptyList)).toBe(1))
 
-describe('Total likes of blog entries', () => {
+describe.skip('Total likes of blog entries', () => {
     // Total likes
     test('Zero entries', () => expect(TestHelper.totalLikes(emptyList)).toBe(0))
     test('One entry', () => expect(TestHelper.totalLikes(singleBlog)).toBe(5))
     test('Multiple entries', () => expect(TestHelper.totalLikes(multipleBlogs)).toBe(36))
 })
 
-describe('Top blogs', () => {
+describe.skip('Top blogs', () => {
     // Top blog
     test('Favorite blog, zero entries', () => expect(TestHelper.favoriteBlog(emptyList)).toBe(undefined))
     test('Favorite blog, one entry', () => expect(TestHelper.favoriteBlog(singleBlog)).toBe('Go To Statement Considered Harmful'))
     test('Favorite blog, multiple entries', () => expect(TestHelper.favoriteBlog(multipleBlogs)).toBe("Canonical string reduction"))
 })
 
-describe('Top authors', () => {
+describe.skip('Top authors', () => {
     // Most blogs
     test('Top author, most blogs, zero entries', () => expect(TestHelper.mostBlogs(emptyList).name).toBe(undefined))
     test('Top author, most blogs, one entry', () => expect(TestHelper.mostBlogs(singleBlog).name).toBe('Edsger W. Dijkstra'))
