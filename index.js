@@ -7,6 +7,7 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const middleware = require('./utils/middleware')
 const blogRouter = require('./controllers/blogrouter')
+const usersRouter = require('./controllers/usersRouter')
 const config = require('./utils/config')
 
 mongoose
@@ -22,6 +23,7 @@ if (process.env.NODE_ENV === 'test') {
     app.use(morgan(':method :url :bodycontent :status :res[content-length] - :response-time ms'))
 }
 app.use('/api/blogs', blogRouter)
+app.use('/api/users', usersRouter)
 app.use(middleware.error)
 
 const server = http.createServer(app)

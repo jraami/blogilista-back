@@ -1,16 +1,74 @@
 const mockDB = require('../utils/mockdb')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const supertest = require('supertest')
+const { usersInDB } = require('../utils/testhelper')
 const { app, server } = require('../index')
 const api = supertest(app)
 
 let testDatabase = []
+let testUserbase = []
 
 beforeAll(async () => {
     await Blog.deleteMany({})
     const testEntries = mockDB.testDatabase.map(entry => new Blog(entry))
-    const promiseArray = testEntries.map(entry => entry.save())
-    testDatabase = await Promise.all(promiseArray)
+    const blogArray = testEntries.map(entry => entry.save())
+    testDatabase = await Promise.all(blogArray)
+})
+
+describe.only('User tests', async () => {
+    beforeAll(async () => {
+        await User.deleteMany({})
+        const testUsers = mockDB.testUserbase.map(entry => new User(entry))
+        const userArray = testUsers.map(entry => entry.save())
+        testUserbase = await Promise.all(userArray)
+    })
+
+    test('Create a new user', async () => {
+        const newUser = {
+            username: 'tbest',
+            name: 'Tester Bester',
+            password: 'tester'
+        }
+        const usersBeforeOp = await usersInDB()
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(200)
+            .expect('Content-type', /application\/json/)
+        const usersAfterOp = await usersInDB()
+        expect(usersAfterOp.length).toBe(usersBeforeOp.length + 1)
+        const usernames = usersAfterOp.map(u => u.username)
+        expect(usernames).toContain(newUser.username)
+    })
+    test('Password has to be over 3 chars', async () => {
+        const newUser = {
+            username: 'shortpass',
+            name: 'Short Pass',
+            password: 'to'
+        }
+        const usersBeforeOp = await usersInDB()
+        response = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+        const usersAfterOp = await usersInDB()
+        expect(usersAfterOp.length).toBe(usersBeforeOp.length)
+    })
+    test('Username must be unique', async () => {
+        const newUser = {
+            username: testUserbase[0].username,
+            name: "Testi Tyyppä",
+            password: "halooooooo"
+        }
+        const usersBeforeOp = await usersInDB()
+        response = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+        const usersAfterOp = await usersInDB()
+        expect(usersAfterOp.length).toBe(usersBeforeOp.length)
+    })
 })
 
 describe('API tests', async () => {

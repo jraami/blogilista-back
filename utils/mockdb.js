@@ -1,3 +1,16 @@
+const testUserbase = [
+    {
+        username: "purnuhil",
+        name: "Hilla Purnukka",
+        password: "passu"
+    },
+    {
+        username: "raaja",
+        name: "Jaakko Raami",
+        password: "salane"
+    }
+]
+
 const testDatabase = [
     {
         _id: "5a422a851b54a676234d17f7",
@@ -80,4 +93,4 @@ const singleEntry = [
     }
 ]
 
-module.exports = { testDatabase, testEntry, noLikesEntry, noTitleEntry, noUrlEntry, singleEntry }
+module.exports = { testUserbase, testDatabase, testEntry, noLikesEntry, noTitleEntry, noUrlEntry, singleEntry }

@@ -1,5 +1,6 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const formatPost = (blog) => {
     return {
@@ -7,7 +8,8 @@ const formatPost = (blog) => {
         title: blog.title || "",
         author: blog.author || "Not Known",
         url: blog.url || "",
-        likes: blog.likes || 0
+        likes: blog.likes || 0,
+        userId: blog.userId || ""
     }
 }
 
@@ -27,10 +29,10 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.get('/:id', async (request, response) => {
     try {
-        const entry = await Blog.save()
+        const id = request.params.id
+        const entry = await Blog.findById(id)
         if (entry) {
-            response.status(204).end()
-            response.json(formatPost(entry))
+            response.status(200).json(formatPost(entry)).end()
         } else {
             response.status(404).end()
         }
@@ -39,15 +41,27 @@ blogRouter.get('/:id', async (request, response) => {
         response.status(400).send({ error: exception })
     }
 })
-
+//// JATKA TÄSTÄ
 blogRouter.post('/', async (request, response) => {
     try {
-        const entry = await Blog(formatPost(request.body))
+        const body = request.body
+        const user = await User.findById(body.userId)
+        console.log(user)
+        const blog = new Blog({
+            title: body.title,
+            author: body.author,
+            url: body.url,
+            userId: user._id
+        })
+
+        const entry = await Blog(formatPost(blog))
         if (entry) {
             if (entry.title === "") return response.status(400).json({ error: 'Entry needs a name' })
             if (entry.url === "") return response.status(400).json({ error: 'Entry needs a URL' })
             const entrySaved = await entry.save()
             if (entrySaved) {
+                user.entries = user.entries.concat(entrySaved._id)
+                await user.save()
                 response.status(201).json(entrySaved)
             }
         } else {
