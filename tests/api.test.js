@@ -4,12 +4,13 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 
+let testDatabase = []
+
 beforeAll(async () => {
     await Blog.deleteMany({})
-    mockDB.testDatabase.forEach(async (entry) => {
-        let blogEntry = new Blog(entry)
-        await blogEntry.save()
-    })
+    const testEntries = mockDB.testDatabase.map(entry => new Blog(entry))
+    const promiseArray = testEntries.map(entry => entry.save())
+    testDatabase = await Promise.all(promiseArray)
 })
 
 describe('API tests', async () => {
@@ -22,13 +23,25 @@ describe('API tests', async () => {
     })
 
     test('POST works', async () => {
-        await api
+        const response = await api
             .post('/api/blogs')
             .send(mockDB.testEntry)
             .expect(201)
             .expect('Content-Type', /application\/json/)
+        expect(response.body.title === mockDB.testEntry.title)
+        const isPosted = await api
+            .get('/api/blogs/' + response.body._id)
+        expect(isPosted.body.title === mockDB.testEntry.title)
+    })
+    test('PUT Add like to an entry', async () => {
+        const response = await api
+            .put('/api/blogs/' + testDatabase[0]._id)
+            .send(testDatabase[0])
+            .expect(201)
+        expect(response.body.likes).toBe(testDatabase[0].likes + 1)
     })
 })
+
 
 describe('Blog entry form tests', async () => {
 
@@ -52,6 +65,7 @@ describe('Blog entry form tests', async () => {
             .expect(400)
     })
 })
+
 
 afterAll(() => {
     server.close()

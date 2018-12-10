@@ -56,7 +56,7 @@ const testEntry = {
     likes: 5
 }
 const noLikesEntry = {
-    title: 'A harmless test entry',
+    title: 'This entry has no likes',
     author: 'Asshole B. Munch',
     url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
 }

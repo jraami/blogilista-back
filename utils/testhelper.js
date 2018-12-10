@@ -80,5 +80,8 @@ const mostLikes = (blogs) => {
     }
 }
 
+const documentsInDB = (blogs) => {
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes }
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes, documentsInDB }
