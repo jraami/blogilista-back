@@ -2,21 +2,13 @@ const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
-const format = (user) => {
-    return {
-        id: user._id,
-        username: user.username,
-        name: user.name || "",
-        adult: user.adult || true,
-        entries: user.entries || ""
-    }
-}
-
 usersRouter.get('/', async (request, response) => {
     try {
-        const entries = await User.find({})
+        const entries = await User
+            .find({})
+            .populate('entries')
         if (entries) {
-            response.json(entries.map(format))
+            response.json(entries.map(User.format))
         } else {
             response.status(404).end()
         }
@@ -29,9 +21,11 @@ usersRouter.get('/', async (request, response) => {
 usersRouter.get('/:id', async (request, response) => {
     try {
         const id = request.params.id
-        const entry = await User.findById(id)
+        const entry = await User
+            .findById(id)
+            .populate('entries')
         if (entry) {
-            response.status(200).json(format(entry)).end()
+            response.status(200).json(User.format(entry)).end()
         } else {
             response.status(404).end()
         }
@@ -70,5 +64,13 @@ usersRouter.post('/', async (request, response) => {
     }
 })
 
+usersRouter.delete('/', async (request, response) => {
+    try {
+        await User.deleteMany({})
+        response.status(204).end()
+    } catch (exception) {
+        response.status(400).send({ error: exception })
+    }
+})
 
 module.exports = usersRouter

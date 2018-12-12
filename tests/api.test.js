@@ -16,7 +16,7 @@ beforeAll(async () => {
     testDatabase = await Promise.all(blogArray)
 })
 
-describe.only('User tests', async () => {
+describe('User tests', async () => {
     beforeAll(async () => {
         await User.deleteMany({})
         const testUsers = mockDB.testUserbase.map(entry => new User(entry))
